@@ -110,4 +110,3 @@ Ensures accurate and locale-aware currency formatting (₹), avoiding manual for
 
 ------------------------------------------------------------------------
 
-Author: Umaid
