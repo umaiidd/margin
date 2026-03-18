@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Margin — Personal Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<style>
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────── */
+:root{
+  --page:    #f5f5f7;
+  --white:   #ffffff;
+  --g1:      #f2f2f7;
+  --g2:      #e8e8ed;
+  --g3:      #d1d1d6;
+  --g4:      #8e8e93;
+  --g5:      #48484a;
+  --black:   #1c1c1e;
+
+  --line:    rgba(0,0,0,0.07);
+  --line2:   rgba(0,0,0,0.04);
+
+  --t1:#1c1c1e;--t2:#3a3a3c;--t3:#636366;--t4:#8e8e93;--t5:#c7c7cc;
+
+  /* Vivid system colors */
+  --green:   #30d158; --green-d:#248a3d;
+  --gbg:     rgba(48,209,88,.1); --gbd:rgba(48,209,88,.3);
+
+  --red:     #ff453a; --red-d:#c0392b;
+  --rbg:     rgba(255,69,58,.08); --rbd:rgba(255,69,58,.28);
+
+  --blue:    #0a84ff; --blue-d:#0056cc;
+  --bbg:     rgba(10,132,255,.08); --bbd:rgba(10,132,255,.25);
+
+  --orange:  #ff9f0a;
+  --purple:  #bf5af2;
+  --teal:    #5ac8fa;
+  --pink:    #ff375f;
+  --indigo:  #5e5ce6;
+
+  --sh:      0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.06);
+  --sh2:     0 4px 16px rgba(0,0,0,.08),0 12px 40px rgba(0,0,0,.1);
+  --sh3:     0 0 0 1px rgba(0,0,0,0.06);
+}
+
+/* ─────────────────────────────────────────
+   RESET + BASE
+───────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--page);color:var(--t1);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+::selection{background:rgba(10,132,255,.15)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--g3);border-radius:4px}
+
+.mono{font-family:'DM Mono',monospace}
+
+/* ─────────────────────────────────────────
+   NAV — Apple-style frosted glass
+───────────────────────────────────────── */
+.nav{
+  position:sticky;top:0;z-index:50;height:52px;
+  display:flex;align-items:center;
+  background:rgba(245,245,247,.88);
+  backdrop-filter:saturate(200%) blur(28px);
+  -webkit-backdrop-filter:saturate(200%) blur(28px);
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  will-change:transform;
+}
+.nav-inner{max-width:1180px;margin:0 auto;padding:0 32px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:9px}
+.brand-name{font-size:17px;font-weight:700;color:var(--t1);letter-spacing:-.03em}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-date{font-size:12px;color:var(--t4);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:var(--black);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;letter-spacing:-.01em}
+
+/* ─────────────────────────────────────────
+   PAGE WRAP
+───────────────────────────────────────── */
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px 64px}
+
+/* ─────────────────────────────────────────
+   HERO SECTION — full-width white strip
+───────────────────────────────────────── */
+.hero-strip{
+  background:var(--white);
+  margin:0 -32px 28px;
+  padding:36px 32px 30px;
+  border-bottom:1px solid var(--line2);
+  position:relative;overflow:hidden;
+}
+/* Subtle dot grid background */
+.hero-strip::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size:24px 24px;
+  pointer-events:none;
+}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);margin-bottom:12px;position:relative}
+.hero-number-row{display:flex;align-items:flex-end;gap:0;position:relative;margin-bottom:24px}
+.hero-currency{font-size:28px;font-weight:700;color:var(--t3);margin-bottom:8px;margin-right:4px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.hero-big{font-size:clamp(52px,7vw,84px);font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--t1)}
+.hero-big.positive{color:var(--t1)}
+.hero-big.negative{color:var(--red)}
+.hero-decimal{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-.04em;color:var(--t3);margin-bottom:3px;align-self:flex-end}
+
+.hero-pills{display:flex;gap:10px;flex-wrap:wrap}
+.hero-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--g1);border:1px solid var(--line);
+  border-radius:100px;padding:6px 14px 6px 8px;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+}
+.hero-pill:hover{background:var(--white);box-shadow:var(--sh);transform:translateY(-1px)}
+.hero-pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.hero-pill-label{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--t4)}
+.hero-pill-val{font-size:14px;font-weight:700;letter-spacing:-.03em}
+
+/* ─────────────────────────────────────────
+   STAT CARDS
+───────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat-card{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:18px;padding:22px 22px 20px;
+  position:relative;overflow:hidden;cursor:default;
+  transition:transform .22s cubic-bezier(.35,0,.15,1),box-shadow .22s;
+  box-shadow:var(--sh3);
+}
+.stat-card::before{
+  content:'';position:absolute;top:-40px;right:-20px;
+  width:100px;height:100px;border-radius:50%;
+  opacity:.08;pointer-events:none;
+  transition:opacity .3s;
+}
+.stat-card:hover{transform:translateY(-3px);box-shadow:var(--sh)}
+.stat-card:hover::before{opacity:.14}
+.sc-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t4);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.sc-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* Number styling — the "clean number" style */
+.sc-number{display:flex;align-items:baseline;gap:2px;margin-bottom:4px}
+.sc-currency{font-size:13px;font-weight:600;color:var(--t4);font-variant-numeric:tabular-nums;align-self:flex-start;margin-top:4px}
+.sc-int{font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.sc-dec{font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--t3);align-self:flex-end;margin-bottom:1px}
+.sc-sub{font-size:12px;color:var(--t4);font-family:'DM Mono',monospace;margin-top:2px}
+
+/* ─────────────────────────────────────────
+   SECTION DIVIDER
+───────────────────────────────────────── */
+.sec-div{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sec-div-line{flex:1;height:1px;background:var(--line2)}
+.sec-div-text{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--t5);white-space:nowrap}
+
+/* ─────────────────────────────────────────
+   MAIN GRID
+───────────────────────────────────────── */
+.main-grid{display:grid;grid-template-columns:372px 1fr;gap:16px;align-items:start}
+.lcol{display:flex;flex-direction:column;gap:14px;position:sticky;top:60px}
+
+/* ─────────────────────────────────────────
+   CARDS
+───────────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh3);overflow:hidden}
+.ch{padding:20px 22px;border-bottom:1px solid var(--line2);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ct{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.02em}
+.cs{font-size:12px;color:var(--t3);margin-top:2px}
+.cb{padding:18px 22px 22px}
+
+/* ─────────────────────────────────────────
+   FORM
+───────────────────────────────────────── */
+.form-body{padding:18px 22px 22px;display:flex;flex-direction:column;gap:14px}
+.fl{font-size:12px;font-weight:500;color:var(--t3);margin-bottom:6px;display:block;letter-spacing:.01em}
+.fi{
+  width:100%;background:var(--g1);border:1px solid var(--line);
+  border-radius:10px;padding:11px 13px;font-size:14px;
+  font-family:'Inter',sans-serif;color:var(--t1);outline:none;
+  -webkit-appearance:none;appearance:none;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.fi::placeholder{color:var(--t5)}
+.fi:focus{background:var(--white);border-color:rgba(10,132,255,.5);box-shadow:0 0 0 3px rgba(10,132,255,.1)}
+.fi.e{border-color:rgba(255,69,58,.45)}
+.fi.e:focus{box-shadow:0 0 0 3px rgba(255,69,58,.08)}
+.fi-wrap{position:relative}
+.fi-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--t4)}
+.fi-pre{position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;user-select:none;font-size:14px;font-family:'DM Mono',monospace;color:var(--t3);font-weight:500}
+.fi-err{display:flex;align-items:center;gap:4px;color:var(--red);font-size:12px;margin-top:5px;font-weight:500}
+
+/* Type toggle */
+.seg{display:flex;gap:3px;padding:3px;background:var(--g2);border-radius:12px}
+.sg{flex:1;padding:9px;border:none;cursor:pointer;border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;transition:all .18s cubic-bezier(.4,0,.2,1);background:transparent;color:var(--t4);letter-spacing:-.01em}
+.sg:hover{color:var(--t2)}
+.sg-i.on{background:var(--white);color:var(--green-d);box-shadow:0 1px 4px rgba(0,0,0,.1),var(--sh3)}
+.sg-e.on{background:var(--white);color:var(--red-d);box-shadow:0 1px 4px rgba(0,0,0,.1),var(--sh3)}
+
+/* Category chips in select */
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.cat-chip{
+  display:flex;align-items:center;gap:8px;padding:9px 12px;
+  border:1.5px solid var(--line);border-radius:10px;
+  cursor:pointer;transition:all .15s cubic-bezier(.4,0,.2,1);
+  background:var(--g1);
+}
+.cat-chip:hover{border-color:var(--g3);background:var(--white);transform:translateY(-1px);box-shadow:var(--sh)}
+.cat-chip.selected{background:var(--white);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.cat-chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cat-chip-name{font-size:12px;font-weight:600;color:var(--t2);letter-spacing:-.01em}
+
+/* Submit button */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:700;
+  border:none;border-radius:12px;cursor:pointer;padding:13px 20px;width:100%;
+  transition:all .18s cubic-bezier(.4,0,.2,1);letter-spacing:-.02em;
+}
+.btn-blk{background:var(--black);color:#fff}
+.btn-blk:hover{background:#000;transform:translateY(-1.5px);box-shadow:0 6px 20px rgba(0,0,0,.28)}
+.btn-blk:active{transform:scale(.98);box-shadow:none}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* ─────────────────────────────────────────
+   CHART CONTROLS
+───────────────────────────────────────── */
+.pill-row{display:flex;gap:5px;align-items:center}
+.pill-g{display:flex;gap:2px;padding:3px;background:var(--g1);border:1px solid var(--line2);border-radius:9px}
+.pill{padding:4px 9px;border-radius:7px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all .14s;background:transparent;color:var(--t4);font-family:'Inter',sans-serif;text-transform:capitalize;letter-spacing:.01em}
+.pill.on{background:var(--white);color:var(--t1);box-shadow:var(--sh3)}
+.ibtn{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;transition:all .14s;background:transparent;color:var(--t4)}
+.ibtn.on{background:var(--white);color:var(--t1);box-shadow:var(--sh3)}
+
+/* ─────────────────────────────────────────
+   PROGRESS BAR
+───────────────────────────────────────── */
+.pbar{height:3px;background:var(--g2);border-radius:2px;overflow:hidden}
+.pbar-f{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* ─────────────────────────────────────────
+   TRANSACTION ROWS
+───────────────────────────────────────── */
+.txr{
+  display:flex;align-items:center;gap:13px;
+  padding:13px 20px;border-bottom:1px solid var(--line2);
+  transition:background .1s;position:relative;
+}
+.txr:hover{background:var(--g1)}
+.txr:last-child{border-bottom:none}
+.txr .acts{opacity:0;transition:opacity .15s;display:flex;gap:2px}
+.txr:hover .acts{opacity:1}
+.act{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;background:transparent;transition:all .12s;color:var(--t4)}
+.act.ed:hover{color:var(--t1);background:var(--g2)}
+.act.dl:hover{color:var(--red);background:var(--rbg)}
+
+/* Transaction avatar */
+.tx-av{
+  width:38px;height:38px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;flex-shrink:0;
+  font-family:'Inter',sans-serif;
+  transition:transform .15s;
+}
+.txr:hover .tx-av{transform:scale(1.04)}
+
+/* Transaction amount — styled numbers */
+.tx-amt{display:flex;align-items:baseline;gap:1px}
+.tx-amt-cur{font-size:11px;font-weight:600;color:var(--t4);align-self:flex-start;margin-top:2px}
+.tx-amt-int{font-size:15px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.tx-amt-dec{font-size:11px;font-weight:600;letter-spacing:-.01em;color:var(--t3)}
+.tx-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.01em}
+
+/* ─────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 32px}
+.empty-ico{width:56px;height:56px;border-radius:16px;background:var(--g1);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.empty h3{font-size:17px;font-weight:700;color:var(--t2);margin-bottom:8px;letter-spacing:-.02em}
+.empty p{font-size:14px;color:var(--t3);line-height:1.65;max-width:250px}
+
+/* ─────────────────────────────────────────
+   SUMMARY INSIGHTS
+───────────────────────────────────────── */
+.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.insight-cell{padding:18px 20px;transition:background .12s}
+.insight-cell:hover{background:var(--g1)}
+.insight-cell:nth-child(odd){border-right:1px solid var(--line2)}
+.insight-cell:nth-child(1),.insight-cell:nth-child(2){border-bottom:1px solid var(--line2)}
+.insight-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--t4);margin-bottom:8px}
+.insight-val{font-size:20px;font-weight:800;letter-spacing:-.04em;color:var(--t1)}
+.insight-sub{font-size:11px;color:var(--t4);margin-top:3px;font-family:'DM Mono',monospace}
+
+/* ─────────────────────────────────────────
+   MODAL
+───────────────────────────────────────── */
+.modal-bg{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(245,245,247,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);animation:fadeIn .18s ease}
+.modal-box{width:100%;max-width:440px;animation:popIn .22s cubic-bezier(.34,1.4,.64,1)}
+
+/* ─────────────────────────────────────────
+   TOAST
+───────────────────────────────────────── */
+#toasts{position:fixed;bottom:24px;right:24px;z-index:100;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{
+  background:rgba(28,28,30,.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:12px 16px;font-size:13px;color:#fff;
+  pointer-events:auto;display:flex;align-items:center;gap:10px;
+  min-width:210px;box-shadow:0 8px 32px rgba(0,0,0,.25);
+  animation:slideUp .24s cubic-bezier(.34,1.2,.64,1);font-weight:500;
+}
+.toast.out{animation:slideDown .18s ease forwards}
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+.footer{border-top:1px solid var(--line2);margin-top:36px;padding:22px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer-brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--t3);letter-spacing:-.01em}
+.footer-note{font-size:12px;color:var(--t5);letter-spacing:.01em}
+
+/* ─────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(10px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.spinner{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media(max-width:980px){.main-grid{grid-template-columns:1fr!important}.lcol{position:static!important}}
+@media(max-width:640px){
+  .stat-grid{grid-template-columns:1fr!important}
+  .wrap{padding:0 16px 48px}
+  .hero-strip{margin:0 -16px;padding:28px 16px 24px}
+  .hero-big{font-size:48px!important}
+  .insight-grid{grid-template-columns:1fr!important}
+  .insight-cell:nth-child(odd){border-right:none}
+  .insight-cell:nth-child(2){border-bottom:1px solid var(--line2)}
+}
+canvas{max-height:240px!important}
+.tx-scroll{max-height:580px;overflow-y:auto}
+.tx-scroll::-webkit-scrollbar{width:3px}
+.tx-scroll::-webkit-scrollbar-thumb{background:var(--g3)}
+select option{background:#fff;color:#1c1c1e}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toasts"></div>
+
+<script type="text/babel">
+const {useState,useEffect,useRef,useReducer,useContext,createContext,useCallback,useMemo,Fragment}=React;
+
+/* ══ CONSTANTS ══ */
+const CATS={
+  Food:      {color:'#30d158',bg:'rgba(48,209,88,.12)',emoji:'🍔'},
+  Rent:      {color:'#0a84ff',bg:'rgba(10,132,255,.12)',emoji:'🏠'},
+  Salary:    {color:'#bf5af2',bg:'rgba(191,90,242,.12)',emoji:'💼'},
+  Transport: {color:'#ff9f0a',bg:'rgba(255,159,10,.12)',emoji:'🚗'},
+  Shopping:  {color:'#ff375f',bg:'rgba(255,55,95,.12)', emoji:'🛍️'},
+  Health:    {color:'#5ac8fa',bg:'rgba(90,200,250,.12)',emoji:'❤️'},
+  Entertainment:{color:'#ff6b00',bg:'rgba(255,107,0,.12)',emoji:'🎮'},
+  Investment:{color:'#5e5ce6',bg:'rgba(94,92,230,.12)',emoji:'📈'},
+  Utilities: {color:'#636366',bg:'rgba(99,99,102,.12)', emoji:'⚡'},
+  Other:     {color:'#8e8e93',bg:'rgba(142,142,147,.12)',emoji:'📦'},
+};
+const CAT_NAMES=Object.keys(CATS);
+const SK='margin_v5';
+
+/* ══ UTILS ══ */
+function splitAmount(n){
+  if(!isFinite(n))return{int:'0',dec:'00'};
+  const a=Math.min(Math.abs(n),999999999999);
+  const s=a.toFixed(2);
+  const [i,d]=s.split('.');
+  // Format integer with Indian numbering
+  let int=i;
+  try{int=new Intl.NumberFormat('en-IN').format(parseInt(i));}catch{}
+  return{int,dec:d};
+}
+function fmt(n,compact=false){
+  if(!isFinite(n))return'₹0.00';
+  const a=Math.min(Math.abs(n),999999999999);
+  if(compact&&a>=10000000)return`₹${(a/10000000).toFixed(a>=100000000?0:1)}Cr`;
+  if(compact&&a>=100000)  return`₹${(a/100000).toFixed(a>=1000000?1:2)}L`;
+  try{return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',minimumFractionDigits:2,maximumFractionDigits:2}).format(a);}
+  catch{return`₹${a.toFixed(2)}`;}
+}
+function fdate(iso){
+  try{
+    const d=new Date(iso),n=new Date(),df=n-d;
+    if(df<60000)return'Just now';
+    if(df<3600000)return`${Math.floor(df/60000)}m ago`;
+    if(df<86400000)return`${Math.floor(df/3600000)}h ago`;
+    if(df<604800000)return`${Math.floor(df/86400000)}d ago`;
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  }catch{return'';}
+}
+function fdatefull(iso){try{return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
+function vamt(v){
+  const s=String(v).replace(/[₹,\s]/g,'').trim();
+  if(!s)return{ok:false,e:'Amount is required'};
+  const n=parseFloat(s);
+  if(isNaN(n))return{ok:false,e:'Enter a valid number'};
+  if(n<=0)return{ok:false,e:'Must be greater than ₹0'};
+  if(n>999999999999)return{ok:false,e:'Amount too large'};
+  return{ok:true,v:n};
+}
+
+/* ══ TOAST ══ */
+function toast(msg,icon='✓'){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');el.className='toast';
+  el.innerHTML=`<span style="font-size:16px">${icon}</span><span>${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),200);},3200);
+}
+
+/* ══ STORE ══ */
+function ld(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):[]}catch{return[];}}
+function persist(d){try{localStorage.setItem(SK,JSON.stringify(d))}catch{}}
+function reducer(s,a){
+  let n;
+  switch(a.t){
+    case'A':n=[a.p,...s];break;case'D':n=s.filter(x=>x.id!==a.p);break;
+    case'U':n=s.map(x=>x.id===a.p.id?{...x,...a.p}:x);break;case'C':n=[];break;
+    default:return s;
+  }
+  persist(n);return n;
+}
+const Ctx=createContext(null);
+function Store({children}){
+  const [txs,dispatch]=useReducer(reducer,[],ld);
+  const add=useCallback(f=>{const tx={id:`m_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,title:f.title.trim(),amount:parseFloat(parseFloat(f.amount).toFixed(2)),category:f.category,type:f.type,date:new Date().toISOString()};dispatch({t:'A',p:tx});return tx;},[]);
+  const del=useCallback(id=>dispatch({t:'D',p:id}),[]);
+  const upd=useCallback(tx=>dispatch({t:'U',p:tx}),[]);
+  const clr=useCallback(()=>dispatch({t:'C'}),[]);
+  const inc=useMemo(()=>txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0),[txs]);
+  const exp=useMemo(()=>txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0),[txs]);
+  const bal=inc-exp;
+  const ec=useMemo(()=>txs.filter(t=>t.type==='expense').reduce((a,t)=>({...a,[t.category]:(a[t.category]||0)+t.amount}),{}),[txs]);
+  const ic=useMemo(()=>txs.filter(t=>t.type==='income').reduce((a,t)=>({...a,[t.category]:(a[t.category]||0)+t.amount}),{}),[txs]);
+  return<Ctx.Provider value={{txs,add,del,upd,clr,inc,exp,bal,ec,ic}}>{children}</Ctx.Provider>;
+}
+const useS=()=>useContext(Ctx);
+
+/* ══ ANIMATED NUMBER ══ */
+function useAnim(target,dur=750){
+  const [v,sv]=useState(target);const prev=useRef(target),raf=useRef(null);
+  useEffect(()=>{
+    const s=prev.current,e=target,t0=performance.now();
+    if(raf.current)cancelAnimationFrame(raf.current);
+    const tick=now=>{
+      const p=Math.min((now-t0)/dur,1);
+      const eq=p<.5?4*p*p*p:(p-1)*(2*p-2)*(2*p-2)+1; // ease in-out cubic
+      sv(s+(e-s)*eq);
+      if(p<1)raf.current=requestAnimationFrame(tick);
+      else{sv(e);prev.current=e;}
+    };
+    raf.current=requestAnimationFrame(tick);
+    return()=>raf.current&&cancelAnimationFrame(raf.current);
+  },[target,dur]);
+  return v;
+}
+
+/* ══ LOGO ══ */
+function Logo({size=28}){
+  return(
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#2c2c2e"/><stop offset="100%" stopColor="#1c1c1e"/>
+        </linearGradient>
+        <linearGradient id="bar3" x1="18" y1="27" x2="22" y2="7" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#30d158"/><stop offset="100%" stopColor="#34e060"/>
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="url(#lg)"/>
+      <rect x=".5" y=".5" width="31" height="31" rx="8.5" stroke="rgba(255,255,255,0.08)" fill="none"/>
+      {/* Bars */}
+      <rect x="6"  y="21" width="4" height="6"  rx="1.5" fill="rgba(255,255,255,.22)"/>
+      <rect x="12" y="16" width="4" height="11" rx="1.5" fill="rgba(255,255,255,.48)"/>
+      <rect x="18" y="9"  width="4" height="18" rx="1.5" fill="url(#bar3)"/>
+      {/* Trend line */}
+      <path d="M8 20.5 L14 15 L20 9" stroke="rgba(48,209,88,.5)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx="20" cy="9" r="1.6" fill="#30d158"/>
+    </svg>
+  );
+}
+
+/* ══ STYLED NUMBER ══ */
+function StyledNum({amount,color='var(--t1)',large=false,showSign=false}){
+  const {int,dec}=splitAmount(amount);
+  const sign=showSign&&amount>0?'+':amount<0?'−':'';
+  if(large) return(
+    <div className="hero-number-row">
+      <span className="hero-currency" style={{color:'var(--t3)'}}>₹</span>
+      <span className="hero-big" style={{color}}>{int}</span>
+      <span className="hero-decimal" style={{color:'var(--t3)'}}>.{dec}</span>
+    </div>
+  );
+  return(
+    <div className="sc-number">
+      {sign&&<span style={{fontSize:14,fontWeight:700,color,marginRight:1}}>{sign}</span>}
+      <span className="sc-currency">₹</span>
+      <span className="sc-int" style={{color}}>{int}</span>
+      <span className="sc-dec">.{dec}</span>
+    </div>
+  );
+}
+
+/* ══ NAV ══ */
+function Nav(){
+  const ref=useRef(null);
+  useEffect(()=>{
+    gsap.fromTo(ref.current,{opacity:0,y:-16},{opacity:1,y:0,duration:.5,ease:'power3.out'});
+  },[]);
+  return(
+    <nav className="nav" ref={ref} style={{opacity:0}}>
+      <div className="nav-inner">
+        <div className="brand">
+          <Logo size={28}/>
+          <span className="brand-name">Margin</span>
+        </div>
+        <div className="nav-right">
+          <span className="nav-date">{new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</span>
+          <div className="nav-avatar">M</div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+/* ══ HERO ══ */
+function Hero(){
+  const {inc,exp,bal,txs}=useS();
+  const anim=useAnim(bal);
+  const ref=useRef(null);
+  useEffect(()=>{
+    if(!ref.current)return;
+    const els=ref.current.querySelectorAll('.ha');
+    gsap.fromTo(els,{opacity:0,y:18},{opacity:1,y:0,duration:.7,stagger:.08,ease:'power3.out',delay:.08});
+  },[]);
+  const isPos=bal>=0;
+  return(
+    <div className="hero-strip" ref={ref}>
+      <p className="hero-eyebrow ha" style={{opacity:0}}>Net Balance</p>
+      <div className="ha" style={{opacity:0}}>
+        <StyledNum amount={useAnim(bal)} color={isPos?'var(--t1)':'var(--red)'} large showSign={false}/>
+      </div>
+      <div className="hero-pills ha" style={{opacity:0}}>
+        {[
+          {l:'Income',v:inc,c:'var(--green-d)',dot:'#30d158'},
+          {l:'Expenses',v:exp,c:'var(--red-d)',dot:'#ff453a'},
+          {l:'Saved',v:inc>0?((bal/inc)*100):0,c:isPos?'var(--green-d)':'var(--red-d)',dot:isPos?'#30d158':'#ff453a',pct:true},
+          {l:'Transactions',v:txs.length,c:'var(--t2)',dot:'#8e8e93',raw:true},
+        ].map(item=>(
+          <div key={item.l} className="hero-pill">
+            <span className="hero-pill-dot" style={{background:item.dot}}/>
+            <span className="hero-pill-label">{item.l}</span>
+            <span className="hero-pill-val" style={{color:item.c}}>
+              {item.raw?item.v:item.pct?`${Math.abs(item.v).toFixed(1)}%`:fmt(item.v,true)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══ STAT CARD ══ */
+const SCFG={
+  income: {l:'Total Income',  c:'var(--green-d)', bg:'#30d158',dot:'#30d158',icon:'+'},
+  expense:{l:'Total Expenses',c:'var(--red-d)',   bg:'#ff453a',dot:'#ff453a',icon:'−'},
+  balance:{l:'Net Balance',   c:'var(--blue)',    bg:'#0a84ff',dot:'#0a84ff',icon:'◉'},
+};
+function StatCard({type,amount,idx}){
+  const cfg=SCFG[type];const anim=useAnim(amount);const ref=useRef(null);
+  const isBal=type==='balance',isNeg=isBal&&amount<0;
+  const color=isBal?(amount>=0?'var(--green-d)':'var(--red-d)'):cfg.c;
+  const dot  =isBal?(amount>=0?'#30d158':'#ff453a'):cfg.dot;
+  useEffect(()=>{
+    gsap.fromTo(ref.current,{opacity:0,y:22,scale:.97},{opacity:1,y:0,scale:1,duration:.55,delay:.2+idx*.07,ease:'power3.out'});
+  },[]);
+  return(
+    <div ref={ref} className="stat-card" style={{opacity:0}}>
+      <div style={{position:'absolute',top:-40,right:-20,width:110,height:110,borderRadius:'50%',background:dot,opacity:.07,pointerEvents:'none',transition:'opacity .3s'}}/>
+      <div className="sc-label">
+        {cfg.l}
+        <div className="sc-icon" style={{background:`${dot}15`}}>
+          <span style={{fontSize:12,fontWeight:800,color}}>{cfg.icon}</span>
+        </div>
+      </div>
+      <StyledNum amount={anim} color={isNeg?'var(--red-d)':color} showSign={false}/>
+      <div className="sc-sub">{fmt(Math.abs(amount))}</div>
+    </div>
+  );
+}
+
+/* ══ CATEGORY CHIP SELECTOR ══ */
+function CatPicker({value,onChange}){
+  return(
+    <div className="cat-grid">
+      {CAT_NAMES.map(name=>{
+        const cat=CATS[name];
+        const sel=value===name;
+        return(
+          <div key={name} className={`cat-chip ${sel?'selected':''}`}
+            onClick={()=>onChange(name)}
+            style={{
+              borderColor:sel?cat.color:'var(--line)',
+              background:sel?cat.bg:'var(--g1)',
+              transform:sel?'translateY(-1px)':'none',
+              boxShadow:sel?`0 2px 10px ${cat.color}25`:'none',
+            }}>
+            <span style={{fontSize:14}}>{cat.emoji}</span>
+            <span className="cat-chip-name" style={{color:sel?cat.color:'var(--t2)'}}>{name}</span>
+            {sel&&(
+              <svg style={{marginLeft:'auto',flexShrink:0}} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={cat.color} strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ══ FORM ══ */
+function TxForm({editing,onClose}){
+  const {add,upd}=useS();
+  const isE=Boolean(editing);
+  const [f,sf]=useState({title:editing?.title||'',amount:editing?.amount?.toString()||'',category:editing?.category||'Food',type:editing?.type||'expense'});
+  const [er,se]=useState({});const [busy,sb]=useState(false);
+  const ref=useRef(null),btnR=useRef(null);
+  useEffect(()=>{gsap.fromTo(ref.current,{opacity:0,y:-8},{opacity:1,y:0,duration:.28,ease:'power2.out'});},[]);
+  const set=(k,v)=>{sf(p=>({...p,[k]:v}));se(p=>({...p,[k]:undefined}));};
+  const validate=()=>{
+    const e={};
+    if(!f.title.trim())e.title='Title is required';
+    else if(f.title.trim().length<2)e.title='Min 2 characters';
+    const av=vamt(f.amount);if(!av.ok)e.amount=av.e;
+    se(e);return Object.keys(e).length===0;
+  };
+  const submit=async()=>{
+    if(!validate()){gsap.to(btnR.current,{x:[-6,6,-5,5,0],duration:.3,ease:'power2.out'});return;}
+    sb(true);await new Promise(r=>setTimeout(r,160));
+    if(isE){
+      upd({...editing,...f,amount:parseFloat(parseFloat(f.amount).toFixed(2))});
+      toast('Transaction updated','✏️');onClose();
+    } else {
+      add(f);
+      const a=parseFloat(parseFloat(f.amount).toFixed(2));
+      toast(f.type==='income'?`₹${a.toFixed(2)} income added`:`₹${a.toFixed(2)} expense recorded`,f.type==='income'?'📈':'📉');
+      sf({title:'',amount:'',category:'Food',type:'expense'});se({});
+      // Celebrate income with a pulse on the button
+      if(f.type==='income')gsap.fromTo(btnR.current,{scale:1.04},{scale:1,duration:.3,ease:'elastic.out(1,.5)'});
+    }
+    sb(false);
+  };
+  return(
+    <div ref={ref} className="card" style={{opacity:0}}>
+      <div className="ch">
+        <div>
+          <p className="ct">{isE?'Edit Transaction':'New Transaction'}</p>
+          <p className="cs">{isE?'Update the details below':'Record an income or expense'}</p>
+        </div>
+        {isE&&<button onClick={onClose} style={{width:28,height:28,borderRadius:8,background:'var(--g1)',border:'1px solid var(--line)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--t3)',transition:'all .12s',flexShrink:0}}
+          onMouseEnter={e=>{e.currentTarget.style.background='var(--g2)';e.currentTarget.style.color='var(--t1)'}}
+          onMouseLeave={e=>{e.currentTarget.style.background='var(--g1)';e.currentTarget.style.color='var(--t3)'}}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>}
+      </div>
+      <div className="form-body">
+        {/* Type seg */}
+        <div className="seg">
+          {['expense','income'].map(t=>(
+            <button key={t} type="button" onClick={()=>set('type',t)} className={`sg sg-${t[0]} ${f.type===t?'on':''}`}>
+              {t==='income'?'↑  Income':'↓  Expense'}
+            </button>
+          ))}
+        </div>
+        {/* Title */}
+        <div>
+          <span className="fl">Title</span>
+          <div className="fi-wrap">
+            <svg className="fi-ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            <input type="text" value={f.title} onChange={e=>set('title',e.target.value)} placeholder="e.g. Groceries, Salary, Netflix…" className={`fi ${er.title?'e':''}`} style={{paddingLeft:34}} maxLength={80}/>
+          </div>
+          {er.title&&<p className="fi-err"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{er.title}</p>}
+        </div>
+        {/* Amount */}
+        <div>
+          <span className="fl">Amount</span>
+          <div className="fi-wrap">
+            <span className="fi-pre">₹</span>
+            <input type="number" value={f.amount} onChange={e=>set('amount',e.target.value)} placeholder="0.00" min="0.01" step="0.01" className={`fi mono ${er.amount?'e':''}`} style={{paddingLeft:26}}/>
+          </div>
+          {er.amount&&<p className="fi-err"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{er.amount}</p>}
+        </div>
+        {/* Category picker */}
+        <div>
+          <span className="fl">Category</span>
+          <CatPicker value={f.category} onChange={v=>set('category',v)}/>
+        </div>
+        {/* Submit */}
+        <button ref={btnR} type="button" onClick={submit} disabled={busy} className="btn btn-blk">
+          {busy
+            ?<><span className="spinner"/>Processing…</>
+            :<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>{isE?'Save Changes':`Add ${f.type==='income'?'Income':'Expense'}`}</>
+          }
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ══ CHARTS ══ */
+function Charts(){
+  const {ec,ic}=useS();
+  const [ct,sCt]=useState('doughnut');const [vw,sVw]=useState('expense');
+  const cvRef=useRef(null),chRef=useRef(null),ref=useRef(null);
+  useEffect(()=>{gsap.fromTo(ref.current,{opacity:0,y:12},{opacity:1,y:0,duration:.4,delay:.14,ease:'power2.out'});},[]);
+  const data=vw==='expense'?ec:ic;const cats=Object.keys(data);const vals=Object.values(data);const total=vals.reduce((s,v)=>s+v,0);
+  const colors=cats.map(c=>CATS[c]?.color||'#8e8e93');
+  const TP={
+    backgroundColor:'#1c1c1e',borderColor:'rgba(255,255,255,.08)',borderWidth:1,
+    titleColor:'rgba(255,255,255,.9)',bodyColor:'rgba(255,255,255,.55)',
+    titleFont:{family:'Inter',size:12,weight:'600'},bodyFont:{family:'DM Mono',size:12},
+    padding:12,cornerRadius:10,displayColors:true,boxWidth:8,boxHeight:8,boxPadding:4,
+  };
+  useEffect(()=>{
+    if(!cvRef.current||cats.length===0){if(chRef.current){chRef.current.destroy();chRef.current=null;}return;}
+    if(chRef.current){chRef.current.destroy();chRef.current=null;}
+    const ctx=cvRef.current.getContext('2d');
+    if(ct==='doughnut'){
+      chRef.current=new Chart(ctx,{type:'doughnut',data:{labels:cats,datasets:[{data:vals,backgroundColor:colors.map(c=>c+'1e'),borderColor:colors,borderWidth:2,hoverBackgroundColor:colors.map(c=>c+'30'),hoverBorderColor:colors,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:true,cutout:'73%',plugins:{legend:{display:false},tooltip:{...TP,callbacks:{label:c=>`  ${fmt(c.raw)} · ${total>0?((c.raw/total)*100).toFixed(1):0}%`}}},animation:{animateRotate:true,animateScale:false,duration:520,easing:'easeInOutQuart'}}});
+    } else {
+      chRef.current=new Chart(ctx,{type:'bar',data:{labels:cats,datasets:[{data:vals,backgroundColor:colors.map(c=>c+'1e'),borderColor:colors,borderWidth:2,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',plugins:{legend:{display:false},tooltip:{...TP,callbacks:{label:c=>`  ${fmt(c.raw)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'rgba(28,28,30,.3)',font:{family:'DM Mono',size:10},callback:v=>fmt(v,true)},border:{color:'transparent'}},y:{grid:{display:false},ticks:{color:'rgba(28,28,30,.6)',font:{family:'Inter',size:11,weight:'500'}},border:{color:'transparent'}}},animation:{duration:460,easing:'easeInOutQuart'}}});
+    }
+    return()=>{if(chRef.current){chRef.current.destroy();chRef.current=null;}};
+  },[data,ct,vw]);
+  const isEmpty=cats.length===0;
+  return(
+    <div ref={ref} className="card" style={{opacity:0}}>
+      <div className="ch">
+        <div><p className="ct">Breakdown</p><p className="cs">Spending by category</p></div>
+        <div className="pill-row">
+          <div className="pill-g">{['expense','income'].map(v=><button key={v} className={`pill ${vw===v?'on':''}`} onClick={()=>sVw(v)}>{v}</button>)}</div>
+          <div className="pill-g">
+            {[{k:'doughnut',i:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>},{k:'bar',i:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>}].map(({k,i})=>(
+              <button key={k} className={`ibtn ${ct===k?'on':''}`} onClick={()=>sCt(k)}>{i}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="cb" style={{paddingTop:16}}>
+        {isEmpty?(
+          <div style={{textAlign:'center',padding:'28px 0'}}>
+            <div style={{width:44,height:44,borderRadius:12,background:'var(--g1)',border:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 10px'}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t4)" strokeWidth="2" strokeLinecap="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            </div>
+            <p style={{color:'var(--t3)',fontSize:13,fontWeight:500}}>No {vw} data yet</p>
+          </div>
+        ):(
+          <>
+            <div style={{position:'relative',maxWidth:ct==='doughnut'?200:'100%',margin:'0 auto'}}>
+              <canvas ref={cvRef}/>
+              {ct==='doughnut'&&(
+                <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
+                  <p style={{fontSize:10,fontWeight:600,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--t4)',margin:0}}>total</p>
+                  <p className="mono" style={{color:'var(--t1)',fontWeight:700,fontSize:16,margin:'2px 0 0',letterSpacing:'-.02em'}}>{fmt(total,true)}</p>
+                </div>
+              )}
+            </div>
+            <div style={{marginTop:16,display:'flex',flexDirection:'column',gap:8}}>
+              {cats.map((cat,i)=>{
+                const pct=total>0?(vals[i]/total)*100:0;
+                const ci=CATS[cat];
+                return(
+                  <div key={cat} style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,padding:'6px 8px',borderRadius:9,transition:'background .12s',cursor:'default'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='var(--g1)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <div style={{display:'flex',alignItems:'center',gap:8,minWidth:0,flex:1}}>
+                      <span style={{fontSize:14,flexShrink:0}}>{ci?.emoji||'•'}</span>
+                      <span style={{fontSize:12,fontWeight:600,color:'var(--t2)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat}</span>
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',gap:9,flexShrink:0}}>
+                      <div className="pbar" style={{width:44}}><div className="pbar-f" style={{width:`${pct}%`,background:colors[i]}}/></div>
+                      <span className="mono" style={{color:'var(--t4)',fontSize:11,width:26,textAlign:'right'}}>{pct.toFixed(0)}%</span>
+                      <span className="mono" style={{color:'var(--t1)',fontSize:12,fontWeight:500,width:66,textAlign:'right'}}>{fmt(vals[i],true)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══ TX LIST ══ */
+function TxList(){
+  const {txs,del,clr}=useS();
+  const [srch,sSr]=useState('');const [tf,stf]=useState('all');const [cf,scf]=useState('all');
+  const [ed,sed]=useState(null);const [pg,spg]=useState(1);
+  const ref=useRef(null);const PER=10;
+  useEffect(()=>{gsap.fromTo(ref.current,{opacity:0,y:8},{opacity:1,y:0,duration:.4,delay:.22,ease:'power2.out'});},[]);
+  const filtered=txs.filter(tx=>{
+    const ms=tx.title.toLowerCase().includes(srch.toLowerCase())||tx.category.toLowerCase().includes(srch.toLowerCase());
+    return ms&&(tf==='all'||tx.type===tf)&&(cf==='all'||tx.category===cf);
+  });
+  const paged=filtered.slice(0,pg*PER);const hm=paged.length<filtered.length;
+  const hdel=(id,t)=>{del(id);toast(`"${t.substring(0,22)}" removed`,'🗑️');};
+  const hclr=()=>{if(!txs.length)return;if(window.confirm('Clear all transactions?')){clr();toast('All transactions cleared','✨');}};
+  const chevron=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='rgba(28,28,30,0.3)' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`;
+  return(
+    <div ref={ref} style={{opacity:0,display:'flex',flexDirection:'column',gap:14}}>
+      {ed&&<div className="modal-bg" onClick={e=>e.target===e.currentTarget&&sed(null)}><div className="modal-box"><TxForm editing={ed} onClose={()=>sed(null)}/></div></div>}
+      <div className="card">
+        <div className="ch">
+          <div>
+            <p className="ct">History</p>
+            <p className="cs">{txs.length===0?'No transactions yet':`${filtered.length} of ${txs.length} entries`}</p>
+          </div>
+          {txs.length>0&&<button onClick={hclr} style={{background:'none',border:'none',cursor:'pointer',color:'var(--t4)',fontSize:12,display:'flex',alignItems:'center',gap:5,fontFamily:'Inter,sans-serif',padding:'6px 9px',borderRadius:8,transition:'all .12s',fontWeight:600}}
+            onMouseEnter={e=>{e.currentTarget.style.color='var(--red)';e.currentTarget.style.background='var(--rbg)'}}
+            onMouseLeave={e=>{e.currentTarget.style.color='var(--t4)';e.currentTarget.style.background='transparent'}}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>Clear all
+          </button>}
+        </div>
+        {txs.length>0&&(
+          <div style={{padding:'14px 22px',borderBottom:'1px solid var(--line2)',display:'flex',gap:8,flexWrap:'wrap'}}>
+            <div style={{position:'relative',flex:1,minWidth:140}}>
+              <svg style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',pointerEvents:'none',color:'var(--t4)'}} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" value={srch} onChange={e=>{sSr(e.target.value);spg(1)}} placeholder="Search…" className="fi" style={{paddingLeft:30,paddingTop:9,paddingBottom:9,fontSize:13}}/>
+              {srch&&<button onClick={()=>{sSr('');spg(1)}} style={{position:'absolute',right:9,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--t4)',display:'flex',padding:2}}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>}
+            </div>
+            <select value={tf} onChange={e=>{stf(e.target.value);spg(1)}} className="fi" style={{width:'auto',minWidth:108,paddingTop:9,paddingBottom:9,fontSize:13,cursor:'pointer',paddingRight:28,backgroundImage:chevron,backgroundRepeat:'no-repeat',backgroundPosition:'right 10px center'}}><option value="all">All types</option><option value="income">Income</option><option value="expense">Expense</option></select>
+            <select value={cf} onChange={e=>{scf(e.target.value);spg(1)}} className="fi" style={{width:'auto',minWidth:126,paddingTop:9,paddingBottom:9,fontSize:13,cursor:'pointer',paddingRight:28,backgroundImage:chevron,backgroundRepeat:'no-repeat',backgroundPosition:'right 10px center'}}><option value="all">All categories</option>{CAT_NAMES.map(c=><option key={c} value={c}>{CATS[c].emoji} {c}</option>)}</select>
+          </div>
+        )}
+        {txs.length===0?(
+          <div className="empty">
+            <div className="empty-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <h3>Get started by adding your first transaction</h3>
+            <p>Track your income and expenses to understand your financial margin.</p>
+          </div>
+        ):filtered.length===0?(
+          <div style={{padding:'44px 24px',textAlign:'center'}}>
+            <p style={{color:'var(--t3)',fontSize:14,fontWeight:500,marginBottom:10}}>No transactions match your filters</p>
+            <button onClick={()=>{sSr('');stf('all');scf('all')}} style={{background:'none',border:'none',cursor:'pointer',color:'var(--blue)',fontSize:13,fontFamily:'Inter,sans-serif',fontWeight:600,textDecoration:'underline',textUnderlineOffset:3}}>Clear filters</button>
+          </div>
+        ):(
+          <>
+            <div className="tx-scroll">
+              {paged.map((tx,i)=><TxRow key={tx.id} tx={tx} isLast={i===paged.length-1&&!hm} onEdit={()=>sed(tx)} onDel={()=>hdel(tx.id,tx.title)}/>)}
+            </div>
+            {hm&&<div style={{borderTop:'1px solid var(--line2)',padding:'12px 20px',textAlign:'center'}}>
+              <button onClick={()=>spg(p=>p+1)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--t3)',fontSize:13,fontFamily:'Inter,sans-serif',display:'flex',alignItems:'center',justifyContent:'center',gap:5,width:'100%',transition:'color .12s',fontWeight:600}}
+                onMouseEnter={e=>e.currentTarget.style.color='var(--t1)'}
+                onMouseLeave={e=>e.currentTarget.style.color='var(--t3)'}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>Show {Math.min(PER,filtered.length-paged.length)} more
+              </button>
+            </div>}
+          </>
+        )}
+      </div>
+      {txs.length>0&&<Insights/>}
+    </div>
+  );
+}
+
+function TxRow({tx,isLast,onEdit,onDel}){
+  const cat=CATS[tx.category];const col=cat?.color||'#8e8e93';const isInc=tx.type==='income';
+  const {int,dec}=splitAmount(tx.amount);
+  return(
+    <div className="txr" style={{borderBottom:isLast?'none':undefined}}>
+      <div className="tx-av" style={{background:cat?.bg||col+'15',border:`1.5px solid ${col}22`}}>
+        <span style={{fontSize:17}}>{cat?.emoji||tx.category[0]}</span>
+      </div>
+      <div style={{flex:1,minWidth:0}}>
+        <p style={{fontSize:14,fontWeight:600,color:'var(--t1)',margin:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',letterSpacing:'-.02em'}}>{tx.title}</p>
+        <div style={{display:'flex',alignItems:'center',gap:7,marginTop:5}}>
+          <span className="tx-tag" style={{background:cat?.bg||col+'12',color:col,border:`1px solid ${col}22`}}>
+            <span style={{fontSize:11}}>{cat?.emoji}</span>{tx.category}
+          </span>
+          <span style={{color:'var(--t5)',fontSize:11,fontWeight:500}} title={fdatefull(tx.date)}>{fdate(tx.date)}</span>
+        </div>
+      </div>
+      {/* Styled number in transaction row */}
+      <div style={{textAlign:'right',flexShrink:0,marginRight:4}}>
+        <div className="tx-amt">
+          {isInc&&<span style={{fontSize:11,fontWeight:700,color:'var(--green-d)',marginRight:1}}>+</span>}
+          {!isInc&&<span style={{fontSize:11,fontWeight:700,color:'var(--t3)',marginRight:1}}>−</span>}
+          <span className="tx-amt-cur" style={{color:'var(--t4)'}}>₹</span>
+          <span className="tx-amt-int" style={{color:isInc?'var(--green-d)':'var(--t1)'}}>{int}</span>
+          <span className="tx-amt-dec">.{dec}</span>
+        </div>
+        <p style={{color:'var(--t5)',fontSize:11,margin:0,marginTop:2,textTransform:'capitalize',fontWeight:500}}>{tx.type}</p>
+      </div>
+      <div className="acts">
+        <button className="act ed" onClick={onEdit} title="Edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button className="act dl" onClick={onDel} title="Delete"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+      </div>
+    </div>
+  );
+}
+
+/* ══ INSIGHTS ══ */
+function Insights(){
+  const {txs,inc,exp,bal}=useS();
+  const sr=inc>0?((bal/inc)*100):0;
+  const avgExp=txs.filter(t=>t.type==='expense').length>0?(exp/txs.filter(t=>t.type==='expense').length):0;
+  const topCat=Object.entries(txs.filter(t=>t.type==='expense').reduce((a,t)=>({...a,[t.category]:(a[t.category]||0)+t.amount}),{})).sort((a,b)=>b[1]-a[1])[0];
+  const incTxCount=txs.filter(t=>t.type==='income').length;
+  const cells=[
+    {l:'Savings Rate',v:`${Math.abs(sr).toFixed(1)}%`,c:sr>0?'var(--green-d)':'var(--red)',s:sr>0?'Saving efficiently':'Review spending'},
+    {l:'Avg. Expense',v:fmt(avgExp,true),c:'var(--t1)',s:`across ${txs.filter(t=>t.type==='expense').length} expenses`},
+    {l:'Top Category',v:topCat?`${CATS[topCat[0]]?.emoji} ${topCat[0]}`:'—',c:topCat?CATS[topCat[0]]?.color:'var(--t3)',s:topCat?fmt(topCat[1],true):'No expenses yet'},
+    {l:'Total Entries',v:txs.length,c:'var(--t1)',s:`${incTxCount} income · ${txs.length-incTxCount} expense`},
+  ];
+  return(
+    <div className="card">
+      <div className="ch"><div><p className="ct">Insights</p><p className="cs">Key financial indicators</p></div></div>
+      <div className="insight-grid">
+        {cells.map(c=>(
+          <div key={c.l} className="insight-cell">
+            <p className="insight-label">{c.l}</p>
+            <p className="insight-val" style={{color:c.c}}>{c.v}</p>
+            <p className="insight-sub">{c.s}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══ FOOTER ══ */
+function Footer(){
+  return(
+    <div className="footer">
+      <div className="footer-brand"><Logo size={18}/>Margin</div>
+      <span className="footer-note">All data stored locally in your browser · Never shared</span>
+    </div>
+  );
+}
+
+/* ══ DASHBOARD ══ */
+function Dashboard(){
+  const {inc,exp,bal}=useS();
+  const ref=useRef(null);
+  useEffect(()=>{
+    if(!ref.current)return;
+    // GSAP ScrollTrigger for section reveals
+    const els=ref.current.querySelectorAll('.reveal');
+    els.forEach(el=>{
+      gsap.fromTo(el,
+        {opacity:0,y:20},
+        {opacity:1,y:0,duration:.65,ease:'power3.out',
+          scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}
+        }
+      );
+    });
+  },[]);
+  return(
+    <div style={{minHeight:'100vh',background:'var(--page)'}}>
+      <Nav/>
+      <div ref={ref} className="wrap">
+        <div className="reveal"><Hero/></div>
+        <div className="stat-grid reveal">
+          <StatCard type="income"  amount={inc} idx={0}/>
+          <StatCard type="expense" amount={exp} idx={1}/>
+          <StatCard type="balance" amount={bal} idx={2}/>
+        </div>
+        <div className="sec-div reveal">
+          <div className="sec-div-line"/><span className="sec-div-text">Transactions & Analytics</span><div className="sec-div-line"/>
+        </div>
+        <div className="main-grid">
+          <div className="lcol">
+            <div className="reveal"><TxForm/></div>
+            <div className="reveal"><Charts/></div>
+          </div>
+          <div className="reveal"><TxList/></div>
+        </div>
+        <div className="reveal"><Footer/></div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Store><Dashboard/></Store>);
+</script>
+</body>
+</html>
